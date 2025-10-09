@@ -19,8 +19,8 @@ app.use(cookieParser());
 
 // Allow CORS
 const allowedOrigins = [
-  'http://localhost:5173', // local frontend
-  'https://e-commerce-mern-dun.vercel.app' // deployed frontend
+  'http://localhost:5173', 
+   'https://shopab.vercel.app/' 
 ];
 
 app.use(cors({
