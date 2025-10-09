@@ -18,8 +18,22 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Allow CORS
+const allowedOrigins = [
+  'http://localhost:5173', // local frontend
+  'https://e-commerce-mern-dun.vercel.app' // deployed frontend
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true); // allowed origin
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
