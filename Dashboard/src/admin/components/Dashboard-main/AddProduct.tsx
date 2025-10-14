@@ -51,52 +51,64 @@ const AddProduct = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const formPayload = new FormData();
-    formPayload.append('product', formData.product);
-    formPayload.append('sku', formData.sku);
-    formPayload.append('stock', formData.stock);
-    formPayload.append('price', formData.price);
-    formPayload.append('status', formData.status);
-    formPayload.append('variants', formData.variants);
-    formPayload.append('marketplaces', JSON.stringify(formData.marketplaces));
-    if (image) formPayload.append('image', image);
+  const formPayload = new FormData();
+  formPayload.append('product', formData.product);
+  formPayload.append('sku', formData.sku);
+  formPayload.append('stock', formData.stock);
+  formPayload.append('price', formData.price);
+  formPayload.append('status', formData.status);
+  formPayload.append('variants', formData.variants);
+  formPayload.append('marketplaces', JSON.stringify(formData.marketplaces));
+  if (image) formPayload.append('image', image);
 
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formPayload,
+    });
+
+    console.log('Response status:', response.status);
+
+    // Try reading response as text first (for debugging)
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+
+    let result;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formPayload,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert('Product Added');
-        setFormData({
-          product: '',
-          sku: '',
-          stock: '',
-          price: '',
-          status: 'In Stock',
-          variants: '',
-          marketplaces: { amazon: false, flipkart: false },
-        });
-        setImage(null);
-
-        const fileInput = document.querySelector<HTMLInputElement>('input[type="file"]');
-        if (fileInput) fileInput.value = '';
-      } else {
-        alert(`Error: ${result.message}`);
-      }
-      console.log(result);
-    } catch (err) {
-      console.error('Error submitting form:', err);
-      alert('Error adding product');
+      result = JSON.parse(responseText);
+    } catch {
+      result = { message: 'Invalid JSON response from server' };
     }
-  };
+
+    if (response.ok) {
+      alert('Product Added');
+      setFormData({
+        product: '',
+        sku: '',
+        stock: '',
+        price: '',
+        status: 'In Stock',
+        variants: '',
+        marketplaces: { amazon: false, flipkart: false },
+      });
+      setImage(null);
+
+      const fileInput = document.querySelector<HTMLInputElement>('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+    } else {
+      alert(`Error: ${result.message}`);
+    }
+
+  } catch (err) {
+    console.error('Error submitting form:', err);
+    alert('Error adding product');
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="p-4 bg-white rounded shadow max-w-lg space-y-4">
