@@ -4,10 +4,10 @@
   "description": "",
   "main": "App.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev1": "ts-node src/App.ts",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/App.ts",
-     "start": "ts-node src/App.ts"
+    "build": "tsc",
+    "start": "node dist/App.js"
   },
   "keywords": [],
   "author": "",

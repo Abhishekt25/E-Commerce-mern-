@@ -11,44 +11,41 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
+//  Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// Allow CORS
+//  CORS Configuration
 const allowedOrigins = [
-  'http://localhost:5173', 
-   'https://shopab.vercel.app/' 
+  'http://localhost:5173',
+  'https://shopab.vercel.app',
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true); // allowed origin
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(' Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
 }));
 
-// Routes
-app.use('/api/', AuthRoutes);
+// 🛠 Routes
+app.use('/api', AuthRoutes);
 
-// Start Server with DB connection
-const startServer = async () => {
+//  Start Server with DB connection
+const startServer = async (): Promise<void> => {
   try {
-    await connectDB(); // connect to MongoDB
+    await connectDB();
     app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+      console.log(`🚀 Server running on http://localhost:${port}`);
     });
   } catch (error) {
-    console.error('Unable to start server:', error);
+    console.error('❌ Unable to start server:', error);
   }
 };
 
