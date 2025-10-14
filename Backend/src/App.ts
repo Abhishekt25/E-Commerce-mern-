@@ -11,33 +11,33 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-//  Middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-//  CORS Configuration
+// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'https://shopab.vercel.app',
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error(' Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
 }));
 
-// 🛠 Routes
+// Routes
 app.use('/api', AuthRoutes);
 
-//  Start Server with DB connection
+// Start Server with DB connection
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
