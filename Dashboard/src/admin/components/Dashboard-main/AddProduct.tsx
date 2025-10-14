@@ -65,7 +65,8 @@ const AddProduct = () => {
     if (image) formPayload.append('image', image);
 
     try {
-      const response = await fetch('http://localhost:2507/api/products', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products`, {
+
         method: 'POST',
         credentials: 'include',
         body: formPayload,
