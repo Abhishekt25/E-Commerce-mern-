@@ -14,7 +14,7 @@ export const connectDB = async (): Promise<void> => {
 
   try {
     await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 5000, // optional: faster error if connection fails
+      serverSelectionTimeoutMS: 5000,
     });
 
     if (NODE_ENV === 'production') {
