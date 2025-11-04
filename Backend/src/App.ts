@@ -5,19 +5,18 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import AuthRoutes from './Routes/authRoutes';
+import AdminRoutes from './Routes/admin';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'https://shopab.vercel.app',
@@ -34,10 +33,13 @@ app.use(cors({
   credentials: true,
 }));
 
-// Routes
 app.use('/api', AuthRoutes);
+app.use('/api/admin', AdminRoutes);
 
-// Start Server with DB connection
+app.get('/api/health', (req, res) => {
+  res.json({ message: 'Server is running!' });
+});
+
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
