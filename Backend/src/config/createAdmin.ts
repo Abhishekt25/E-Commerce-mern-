@@ -33,7 +33,7 @@ const createAdmin = async () => {
     await admin.save();
     console.log('✅ Admin user created successfully');
     console.log('📧 Email: admin@shopab.com');
-    console.log('🔑 Password: admin123');
+    console.log('🔑 Password: 123');
     console.log('⚠️  Change this password immediately after first login!');
     
   } catch (error) {
