@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import AuthRoutes from './Routes/authRoutes';
+import AdminRoutes from './Routes/adminRoutes';
 
 dotenv.config();
 
@@ -36,16 +37,17 @@ app.use(cors({
 
 // Routes
 app.use('/api', AuthRoutes);
+app.use('/api/', AdminRoutes);
 
 // Start Server with DB connection
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
     app.listen(port, () => {
-      console.log(`🚀 Server running on http://localhost:${port}`);
+      console.log(`Server running on http://localhost:${port}`);
     });
   } catch (error) {
-    console.error('❌ Unable to start server:', error);
+    console.error('Unable to start server:', error);
   }
 };
 
