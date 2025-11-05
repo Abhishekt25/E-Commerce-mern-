@@ -8,7 +8,7 @@ import { adminLogin } from "../controllers/adminController";
 const router = express.Router();
 
 //Admin
-router.post("/admin/login", adminLogin);
+router.post("/admin/login", adminLogin);  
 
 //  Public routes
 router.post("/signup", signup);
