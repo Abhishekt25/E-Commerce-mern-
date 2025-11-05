@@ -6,7 +6,7 @@ interface ProtectedAdminRouteProps {
 
 const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) => {
   const token = localStorage.getItem("adminToken");
-  //const userRole = localStorage.getItem("adminName"); // optional check if role saved
+  // const userRole = localStorage.getItem("adminName"); // optional check if role saved
   
   if (!token) {
     return <Navigate to="/admin/login" replace />;
