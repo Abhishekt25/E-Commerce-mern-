@@ -39,7 +39,6 @@ app.use(cors({
 app.use('/api', AuthRoutes);
 app.use('/api/', AdminRoutes);
 
-// Start Server with DB connection 
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
