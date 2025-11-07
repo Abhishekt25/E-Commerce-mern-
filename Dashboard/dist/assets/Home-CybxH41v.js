@@ -1,1 +1,0 @@
-import{j as e}from"./index-DZ6arj1g.js";const t=()=>e.jsxs("div",{className:"p-6",children:[e.jsx("h1",{className:"text-3xl font-bold",children:"Welcome to the Store"}),e.jsx("p",{className:"mt-4",children:"This is the public frontend page."})]});export{t as default};
