@@ -20,7 +20,8 @@ const Setting = () => {
   });
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+
 
   useEffect(() => {
     fetchUsers();
