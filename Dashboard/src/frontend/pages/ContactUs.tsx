@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 
 const ContactUs = () => {
@@ -120,22 +120,6 @@ const ContactUs = () => {
                 <div className="mt-8 pt-8 border-t border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-4">Follow Us</h3>
                 <div className="flex space-x-4">
-                    <a
-                    href="https://facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-600 p-3 rounded-full transition-all duration-200"
-                    >
-                    <FaFacebookF className="w-5 h-5" />
-                    </a>
-                    <a
-                    href="https://twitter.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-sky-500 hover:text-white text-gray-600 p-3 rounded-full transition-all duration-200"
-                    >
-                    <FaTwitter className="w-5 h-5" />
-                    </a>
                     <a
                     href="https://instagram.com"
                     target="_blank"
