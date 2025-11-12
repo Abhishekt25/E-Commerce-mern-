@@ -1,3 +1,4 @@
+// models/User.ts
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -7,6 +8,8 @@ export interface IUser extends Document {
   password: string;
   role: string;
   comparePassword(password: string): Promise<boolean>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>({
@@ -14,6 +17,8 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: "user" }, 
+}, {
+  timestamps: true // This automatically adds createdAt and updatedAt
 });
 
 userSchema.pre("save", async function (next) {

@@ -1,20 +1,21 @@
 // routes/authRoutes.ts
-import express, { Request, Response } from "express";
+import express from "express";
 import { signup, signin } from "../controllers/authController";
-import { verifyToken, AuthRequest } from "../middleware/authMiddleware";
+import { verifyToken, adminOnly, AuthRequest } from "../middleware/authMiddleware";
 import { User } from "../models/User";
 import { adminLogin } from "../controllers/adminController";
+import { getUsers, createUser, updateUserRole, deleteUser } from "../controllers/SettingController";
 
 const router = express.Router();
 
-//Admin
+// Admin
 router.post("/admin/login", adminLogin);  
 
-//  Public routes
+// Public routes
 router.post("/signup", signup);
 router.post("/signin", signin);
 
-//  Protected route - Get logged-in user info
+// Protected route - Get logged-in user info
 router.get("/user", verifyToken, async (req: AuthRequest, res) => {
   try {
     if (!req.user?.id) {
@@ -37,5 +38,11 @@ router.get("/user", verifyToken, async (req: AuthRequest, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// User Management Routes (Admin only)
+router.get("/users", verifyToken, getUsers);
+router.post("/create-user", verifyToken, createUser);
+router.put("/users/:id/role", verifyToken, updateUserRole);
+router.delete("/users/:id", verifyToken, deleteUser);
 
 export default router;
