@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Product, ProductFormData } from './types/product';
-import { generateSlug } from './ utils/helpers'; // Fixed import path
+import { generateSlug } from './utils/helpers'; // Fixed import path
 
 interface ProductModalProps {
   isOpen: boolean;

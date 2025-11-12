@@ -7,7 +7,7 @@ import ProtectedAdminRoute from "./../admin/Auth/ProtectedAdminRoute";
 
 const Home = lazy(() => import("../admin/Adminpages/Home"));
 const Order = lazy(() => import("../admin/Adminpages/Order"));
-const Inventory = lazy(() => import("../admin/Adminpages/inventory/ Inventory"));
+const Inventory = lazy(() => import("../admin/Adminpages/inventory/Inventory"));
 const Analytics = lazy(() => import("../admin/Adminpages/Analytics"));
 const Setting = lazy(() => import("../admin/Adminpages/Setting"));
 const AdminLogin = lazy(() => import("../admin/Auth/AdminLogin"));
