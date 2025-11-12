@@ -1,5 +1,5 @@
 import type { Product } from './types/product';
-import { getStockBadge, formatDate } from './ utils/helpers';
+import { getStockBadge, formatDate } from './utils/helpers';
 
 interface ProductTableProps {
   products: Product[];
