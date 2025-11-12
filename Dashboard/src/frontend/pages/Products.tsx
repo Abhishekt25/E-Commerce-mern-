@@ -11,7 +11,7 @@ interface Product {
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<{ _id: string; quantity: number }[]>([]);
+  const [_cart, setCart] = useState<{ _id: string; quantity: number }[]>([]);
   const [addedProduct, setAddedProduct] = useState<{ name: string; price: number } | null>(null);
   const [showViewCart, setShowViewCart] = useState<string | null>(null); 
   
