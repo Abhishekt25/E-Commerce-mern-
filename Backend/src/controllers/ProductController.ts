@@ -142,3 +142,14 @@ export const getProductById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching product", error });
   }
 };
+
+export const getProductsByCategory = async (req: Request, res: Response) => {
+  try {
+    const { category } = req.params;
+    const products = await Product.find({ categories: category }).sort({ createdAt: -1 });
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    res.status(500).json({ message: 'Error fetching products by category', error });
+  }
+};
