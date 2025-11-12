@@ -7,6 +7,8 @@ import Loading from "../admin/components/Loading";
 const Layout = lazy(() => import("../frontend/Header/Layout"));
 const FrontendHome = lazy(() => import("../frontend/Home"));
 const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
+const Cart = lazy(() => import("../frontend/pages/Cart"));
+const Checkout = lazy(() => import("../frontend/pages/Checkout"));
 const AdminRouter = lazy(() => import("./AdminRouter"));
 
 // Auth pages
@@ -34,6 +36,22 @@ const AppRouter = () => {
             element={
               <Layout>
                 <FrontendProducts />
+              </Layout>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <Layout>
+                <Cart />
+              </Layout>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <Layout>
+                <Checkout />
               </Layout>
             }
           />

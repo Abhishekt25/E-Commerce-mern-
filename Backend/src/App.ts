@@ -3,8 +3,9 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { connectDB } from './config/db';
-import AuthRoutes from './Routes/authRoutes';
+import productRoutes from './Routes/productRoutes';
 import AdminRoutes from './Routes/adminRoutes';
 
 dotenv.config();
@@ -17,6 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Serve uploaded images as static files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // CORS Configuration
 const allowedOrigins = [
@@ -36,7 +40,7 @@ app.use(cors({
 }));
 
 // Routes
-app.use('/api', AuthRoutes);
+app.use('/api/products', productRoutes);
 app.use('/api/', AdminRoutes);
 
 // Start Server with DB connection 

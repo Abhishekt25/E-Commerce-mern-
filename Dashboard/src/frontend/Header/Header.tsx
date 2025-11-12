@@ -8,6 +8,8 @@ const Header: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [userName, setUserName] = useState<string>("");
+  const [cartCount, setCartCount] = useState(0);
+
 
   const backendURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2507";
 
@@ -38,6 +40,32 @@ const Header: React.FC = () => {
 
     fetchUser();
   }, [backendURL]);
+   
+useEffect(() => {
+  const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    //  Calculate total quantity of all items
+    const totalQuantity = cart.reduce(
+      (sum: number, item: { quantity: number }) => sum + (item.quantity || 0),
+      0
+    );
+
+    setCartCount(totalQuantity);
+  };
+
+  updateCartCount(); 
+
+  // Listen for cart updates triggered from anywhere
+  window.addEventListener("cartUpdated", updateCartCount);
+  window.addEventListener("storage", updateCartCount);
+
+  return () => {
+    window.removeEventListener("cartUpdated", updateCartCount);
+    window.removeEventListener("storage", updateCartCount);
+  };
+}, []);
+
 
   // 🔹 Handle login success (called from SignIn)
   const handleLoginSuccess = (user: any) => {
@@ -98,10 +126,15 @@ const Header: React.FC = () => {
               </button>
             )}
 
-            <button className="relative flex items-center text-gray-700 hover:text-gray-900">
+            <Link to="/cart" className="relative flex items-center text-gray-700 hover:text-gray-900">
               <ShoppingCartIcon className="h-6 w-6" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">3</span>
-            </button>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
 
             <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
