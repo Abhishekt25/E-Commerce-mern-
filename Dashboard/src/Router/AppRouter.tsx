@@ -7,6 +7,7 @@ import Loading from "../admin/components/Loading";
 const Layout = lazy(() => import("../frontend/Header/Layout"));
 const FrontendHome = lazy(() => import("../frontend/Home"));
 const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
+import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
 const Checkout = lazy(() => import("../frontend/pages/Checkout"));
 const AdminRouter = lazy(() => import("./AdminRouter"));
@@ -36,6 +37,14 @@ const AppRouter = () => {
             element={
               <Layout>
                 <FrontendProducts />
+              </Layout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <Layout>
+                <ContactUs />
               </Layout>
             }
           />

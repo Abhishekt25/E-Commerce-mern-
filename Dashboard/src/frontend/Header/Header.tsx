@@ -97,7 +97,6 @@ useEffect(() => {
           <nav className="hidden md:flex space-x-6">
             <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
             <Link to="/products" className="text-gray-700 hover:text-gray-900">Products</Link>
-            <Link to="/about" className="text-gray-700 hover:text-gray-900">About</Link>
             <Link to="/contact" className="text-gray-700 hover:text-gray-900">Contact</Link>
           </nav>
 
@@ -148,7 +147,6 @@ useEffect(() => {
         <div className="md:hidden px-4 pb-4 space-y-2">
           <Link to="/" className="block text-gray-700 hover:text-gray-900">Home</Link>
           <Link to="/products" className="block text-gray-700 hover:text-gray-900">Products</Link>
-          <Link to="/about" className="block text-gray-700 hover:text-gray-900">About</Link>
           <Link to="/contact" className="block text-gray-700 hover:text-gray-900">Contact</Link>
         </div>
       )}
