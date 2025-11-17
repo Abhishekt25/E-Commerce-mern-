@@ -1,5 +1,5 @@
 // src/Router/AppRouter.tsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../admin/components/Loading";
 
@@ -11,6 +11,7 @@ import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
 const Checkout = lazy(() => import("../frontend/pages/Checkout"));
 const AdminRouter = lazy(() => import("./AdminRouter"));
+const AdminLogin = lazy(() => import("../admin/Adminpages/AdminLogin"));
 
 // Auth pages
 const SignIn = lazy(() => import("../frontend/pages/Auth/SignIn"));
@@ -23,6 +24,7 @@ const AppRouter = () => {
     <Router>
       <Suspense fallback={<Loading />}>
         <Routes>
+<<<<<<< HEAD
           {/* ---------- FRONTEND ROUTES ---------- */}
           <Route
             path="/"
@@ -72,6 +74,19 @@ const AppRouter = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* ---------- ADMIN ROUTES ---------- */}
+=======
+          {/* Frontend routes wrapped in Layout */}
+          <Route path="/" element={<Layout><FrontendHome /></Layout>} />
+          <Route path="/products" element={<Layout><FrontendProducts /></Layout>} />
+    
+          {/* Admin Login route */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          
+          {/* Redirect /admin to /admin/login directly */}
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          
+          {/* Protected Admin routes */}
+>>>>>>> ab-clean
           <Route path="/admin/*" element={<AdminRouter />} />
         </Routes>
       </Suspense>

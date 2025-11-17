@@ -63,6 +63,7 @@ export const getProducts = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching products', error });
   }
 };
+<<<<<<< HEAD
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
@@ -153,3 +154,5 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching products by category', error });
   }
 };
+=======
+>>>>>>> ab-clean
