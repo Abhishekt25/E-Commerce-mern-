@@ -14,10 +14,7 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.13.1",
-<<<<<<< HEAD
-=======
     "bcryptjs": "^3.0.3",
->>>>>>> 00ffe98b07a5710cd70d50eb7f0b4e74d3bd8e8d
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -29,10 +26,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.4",
-<<<<<<< HEAD
-=======
     "@types/bcryptjs": "^2.4.6",
->>>>>>> 00ffe98b07a5710cd70d50eb7f0b4e74d3bd8e8d
     "@types/body-parser": "^1.19.6",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
