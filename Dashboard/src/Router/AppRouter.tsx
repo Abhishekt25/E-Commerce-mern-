@@ -1,5 +1,5 @@
 // src/Router/AppRouter.tsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../admin/components/Loading";
 
@@ -82,8 +82,6 @@ const AppRouter = () => {
           {/* Admin Login route */}
           <Route path="/admin/login" element={<AdminLogin />} />
           
-          {/* Redirect /admin to /admin/login directly */}
-          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           
           {/* Protected Admin routes */}
 
