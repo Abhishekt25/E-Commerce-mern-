@@ -26,22 +26,18 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const allowedOrigins = [
   'http://localhost:5173',
   'https://shopab.vercel.app',
-  // Add more domains if needed
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like Postman or Curl)
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // allow cookies, sessions, tokens
+  credentials: true,
 }));
-
 
 // Routes
 app.use('/api/products', productRoutes);

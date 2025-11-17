@@ -6,6 +6,7 @@ const AdminLogin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+
   const backendURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2507";
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -16,18 +17,31 @@ const AdminLogin = () => {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Invalid credentials");
-
       const result = await response.json();
-      const { token, user } = result;
+      console.log("Login Response:", result);
+
+      if (!response.ok) {
+        throw new Error(result?.message || "Invalid credentials");
+      }
+
+      // Your backend returns: result.data.token & result.data.user
+      const token = result?.token || result?.data?.token;
+      const user = result?.user || result?.data?.user;
+
+      if (!token || !user) {
+        throw new Error("Invalid server response (missing token or user)");
+      }
 
       if (user.role !== "admin") {
         throw new Error("Access denied. Admins only.");
       }
 
+      // Save session
       localStorage.setItem("adminToken", token);
       localStorage.setItem("adminName", user.name);
-      navigate("/admin/");
+
+      // IMPORTANT: use "/admin" not "/admin/"
+      navigate("/admin");
     } catch (error: any) {
       setErrorMessage(error.message || "An error occurred");
     }
@@ -36,8 +50,13 @@ const AdminLogin = () => {
   return (
     <div className="max-w-md mx-auto mt-20 p-6 bg-white shadow-lg rounded-2xl">
       <h2 className="text-2xl font-semibold text-center mb-6">Admin Login</h2>
-      {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
+
+      {errorMessage && (
+        <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
         <div>
           <label className="block text-sm font-medium">Email</label>
           <input
@@ -45,7 +64,11 @@ const AdminLogin = () => {
             {...register("email", { required: "Email is required" })}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400"
           />
-          {errors.email && <span className="text-red-500 text-sm">{(errors.email as any)?.message}</span>}
+          {errors.email && (
+            <span className="text-red-500 text-sm">
+              {(errors.email as any)?.message}
+            </span>
+          )}
         </div>
 
         <div>
@@ -55,7 +78,11 @@ const AdminLogin = () => {
             {...register("password", { required: "Password is required" })}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-400"
           />
-          {errors.password && <span className="text-red-500 text-sm">{(errors.password as any)?.message}</span>}
+          {errors.password && (
+            <span className="text-red-500 text-sm">
+              {(errors.password as any)?.message}
+            </span>
+          )}
         </div>
 
         <button
