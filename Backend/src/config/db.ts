@@ -8,7 +8,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const connectDB = async (): Promise<void> => {
   if (!MONGO_URI) {
-    console.error('❌ MongoDB URI not found in environment variables');
+    console.error('MongoDB URI not found in environment variables');
     process.exit(1);
   }
 
@@ -18,12 +18,12 @@ export const connectDB = async (): Promise<void> => {
     });
 
     if (NODE_ENV === 'production') {
-      console.log('✅ MongoDB Atlas connected successfully');
+      console.log('MongoDB Atlas connected successfully');
     } else {
-      console.log('✅ Local MongoDB connected successfully');
+      console.log('Local MongoDB connected successfully');
     }
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error('MongoDB connection error:', error);
     process.exit(1);
   }
 };

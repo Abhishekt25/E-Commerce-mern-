@@ -10,6 +10,8 @@ const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
 import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
 const Checkout = lazy(() => import("../frontend/pages/Checkout"));
+const OrderSuccess = lazy(() => import("../frontend/pages/OrderSuccess"));
+const OrdersPage = lazy(() => import("../frontend/pages/OrdersPage"));
 const AdminRouter = lazy(() => import("./AdminRouter"));
 const AdminLogin = lazy(() => import("../admin/Auth/AdminLogin"));
 
@@ -63,6 +65,22 @@ const AppRouter = () => {
             element={
               <Layout>
                 <Checkout />
+              </Layout>
+            }
+          />
+          <Route
+            path="/order-success"
+            element={
+              <Layout>
+                <OrderSuccess />
+              </Layout>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <Layout>
+                <OrdersPage />
               </Layout>
             }
           />
