@@ -79,7 +79,7 @@ const Products = () => {
       {addedProduct && (
         <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex justify-between items-center">
           <span>
-            🛒 <strong>{addedProduct.name}</strong> (${addedProduct.price}) added to cart
+            🛒 <strong>{addedProduct.name}</strong> (₹{addedProduct.price}) added to cart
           </span>
           <button
             onClick={handleViewCart}
@@ -112,10 +112,10 @@ const Products = () => {
             )}
 
             <h2 className="text-lg font-medium">{product.product}</h2>
-            <p className="text-gray-600 mt-1">${product.price}</p>
+            <p className="text-gray-600 mt-1">₹{product.price}</p>
 
             <p
-              className={`mt-2 text-sm font-semibold ${
+              className={`mt-2 text-sm font-semibold ₹{
                 product.stock > 0 ? "text-green-600" : "text-red-600"
               }`}
             >
