@@ -7,6 +7,7 @@ interface Product {
   price: number;
   stock: number;
   image?: string;
+  
 }
 
 const Products = () => {
