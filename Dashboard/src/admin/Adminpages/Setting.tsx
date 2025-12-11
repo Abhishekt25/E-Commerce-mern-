@@ -19,9 +19,12 @@ const Setting = () => {
     role: "user"
   });
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2509";
 
+  // Get admin token from localStorage
+  const getAdminToken = () => {
+    return localStorage.getItem("adminToken");
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -30,13 +33,30 @@ const Setting = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      const token = getAdminToken();
+      
+      if (!token) {
+        alert("Please log in as admin first");
+        window.location.href = "/admin/login";
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/users`, {
+        method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`,
-        }
+          "Authorization": `Bearer ${token}`
+        },
+        credentials: "include",
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("adminToken");
+          localStorage.removeItem("adminName");
+          window.location.href = "/admin/login";
+          return;
+        }
         if (response.status === 403) {
           alert("Access denied. Admin role required.");
           return;
@@ -57,11 +77,18 @@ const Setting = () => {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const token = getAdminToken();
+      if (!token) {
+        alert("Please log in first");
+        window.location.href = "/admin/login";
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/create-user`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -83,11 +110,18 @@ const Setting = () => {
 
   const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
+      const token = getAdminToken();
+      if (!token) {
+        alert("Please log in first");
+        window.location.href = "/admin/login";
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/users/${userId}/role`, {
         method: "PUT",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ role: newRole })
       });
@@ -109,6 +143,13 @@ const Setting = () => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
+      const token = getAdminToken();
+      if (!token) {
+        alert("Please log in first");
+        window.location.href = "/admin/login";
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: "DELETE",
         headers: {
@@ -141,12 +182,20 @@ const Setting = () => {
             <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
             <p className="text-gray-600 mt-2">Manage users and their roles</p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-          >
-            Create New User
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={fetchUsers}
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+            >
+              Refresh
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              Create New User
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -277,6 +326,7 @@ const Setting = () => {
                   <input
                     type="password"
                     required
+                    minLength={6}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

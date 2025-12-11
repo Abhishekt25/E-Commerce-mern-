@@ -1,3 +1,4 @@
+// middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -8,18 +9,35 @@ export interface AuthRequest extends Request {
 }
 
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+  // Try to get token from Authorization header first
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No token provided" });
+  let token: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  }
+  
+  // If not in header, try cookies (for regular users)
+  if (!token) {
+    token = req.cookies.token;
   }
 
-  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token found" });
+  }
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: string;
+      email: string;
+      role: string;
+    };
+
     req.user = decoded;
     next();
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
+  } catch (error) {
+    console.error("Token verification error:", error);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
@@ -38,3 +56,6 @@ export const adminOnly = (req: AuthRequest, res: Response, next: NextFunction) =
 
   next();
 };
+
+// Combined middleware: verify token + admin check
+export const adminAuth = [verifyToken, adminOnly];

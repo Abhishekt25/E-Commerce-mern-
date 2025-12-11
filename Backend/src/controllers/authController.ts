@@ -36,13 +36,25 @@ export const signin = async (req: Request, res: Response) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({
+    // Set JWT inside HttpOnly Cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,           // true in production HTTPS
+      sameSite: "lax",        // prevents CSRF
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    return res.status(200).json({
       message: "Login successful",
-      token,
-      user: { name: user.name, email: user.email, role: user.role },
+      user: { 
+        name: user.name, 
+        email: user.email, 
+        role: user.role 
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 

@@ -57,3 +57,18 @@ export const getUserOrders = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = await Order.find()
+      .populate('userId', 'email name')
+      .populate('items.productId', 'name')
+      .sort({ createdAt: -1 });
+    
+    res.json(orders);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

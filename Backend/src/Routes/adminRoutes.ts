@@ -8,7 +8,7 @@ import { getUsers, createUser, updateUserRole, deleteUser } from "../controllers
 
 const router = express.Router();
 
-// Admin
+// Admin login
 router.post("/admin/login", adminLogin);  
 
 // Public routes
@@ -39,10 +39,10 @@ router.get("/user", verifyToken, async (req: AuthRequest, res) => {
   }
 });
 
-// User Management Routes (Admin only)
-router.get("/users", verifyToken, getUsers);
-router.post("/create-user", verifyToken, createUser);
-router.put("/users/:id/role", verifyToken, updateUserRole);
-router.delete("/users/:id", verifyToken, deleteUser);
+// User Management Routes (Admin only - requires Bearer token)
+router.get("/users", verifyToken, adminOnly, getUsers);
+router.post("/create-user", verifyToken, adminOnly, createUser);
+router.put("/users/:id/role", verifyToken, adminOnly, updateUserRole);
+router.delete("/users/:id", verifyToken, adminOnly, deleteUser);
 
 export default router;
