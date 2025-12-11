@@ -22,15 +22,16 @@ const SignIn: React.FC<SignInProps> = ({ onLoginSuccess }) => {
       const response = await fetch(`${backendURL}/api/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",  // IMPORTANT for cookies
         body: JSON.stringify(data),
       });
 
       if (!response.ok) throw new Error("Invalid email or password.");
 
       const result = await response.json();
-      const { token, user } = result;
+      const user = result.user; // no more token
 
-      localStorage.setItem("token", token);
+      // No localStorage for token — only optionally user info if you want
       localStorage.setItem("userName", user.name);
       localStorage.setItem("userRole", user.role);
 
