@@ -9,13 +9,15 @@ export const signup = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
 
     const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "Email already exists" });
+    if (existing) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
 
-    const newUser = new User({ name, email, password });
-    await newUser.save();
+    const user = new User({ name, email, password });
+    await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -36,25 +38,16 @@ export const signin = async (req: Request, res: Response) => {
       { expiresIn: "1d" }
     );
 
-    // Set JWT inside HttpOnly Cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,           // true in production HTTPS
-      sameSite: "lax",        // prevents CSRF
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    return res.status(200).json({
+    res.json({
       message: "Login successful",
-      user: { 
-        name: user.name, 
-        email: user.email, 
-        role: user.role 
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
