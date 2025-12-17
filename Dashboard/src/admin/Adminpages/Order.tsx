@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 interface OrderItem {
-  productId: string;
+  productId:
+    | string
+    | {
+        _id: string;
+        name?: string;
+      };
   quantity: number;
   price: number;
   _id: string;
 }
+
 
 interface ShippingAddress {
   street: string;
@@ -16,9 +21,15 @@ interface ShippingAddress {
   country: string;
 }
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 interface Order {
   _id: string;
-  userId: string;
+  userId: string | User; // Can be string or User object
   items: OrderItem[];
   subtotal: number;
   shippingCost: number;
@@ -32,60 +43,69 @@ interface Order {
   updatedAt: string;
 }
 
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2509";
 
 const Order = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [filters, setFilters] = useState({
     status: 'all',
     date: 'all',
     search: '',
     paymentMethod: 'all'
   });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
-     fetchOrders();
+    fetchOrders();
   }, []);
 
- const fetchOrders = async () => {
-  try {
-    setLoading(true);
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await axios.get('/api/orders/all', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+      const response = await fetch(`${API_BASE_URL}/api/orders/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    });
 
-    const data = response.data;
+      const data = await response.json();
+      console.log('Fetched orders data:', data);
 
-    const orderArray = Array.isArray(data)
-      ? data
-      : Array.isArray(data.orders)
-      ? data.orders
-      : [];
+      const orderArray = Array.isArray(data)
+        ? data
+        : Array.isArray(data.orders)
+        ? data.orders
+        : [];
 
-    setOrders(orderArray);
-
-  } catch (err) {
-    setError('Failed to fetch orders');
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+      setOrders(orderArray);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return 'Invalid date';
       
-      // Format: Dec 4, 2025
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const month = monthNames[date.getMonth()];
       const day = date.getDate();
@@ -95,6 +115,47 @@ const Order = () => {
     } catch {
       return 'Invalid date';
     }
+  };
+
+  // Get customer name from order
+  const getCustomerName = (order: Order): string => {
+    const userId = order.userId;
+    
+    // Check if it's an object with name property
+    if (userId && typeof userId === 'object' && 'name' in userId) {
+      return (userId as User).name || 'Unknown Customer';
+    }
+    
+    return 'Unknown Customer';
+  };
+
+  // Get customer email from order
+  const getCustomerEmail = (order: Order): string => {
+    const userId = order.userId;
+    
+    // Check if it's an object with email property
+    if (userId && typeof userId === 'object' && 'email' in userId) {
+      return (userId as User).email || 'No email';
+    }
+    
+    return 'No email';
+  };
+
+  // Get customer ID safely
+  const getCustomerId = (order: Order): string => {
+    const userId = order.userId;
+    
+    // Check if it's an object with _id property
+    if (userId && typeof userId === 'object' && '_id' in userId) {
+      return (userId as User)._id;
+    }
+    
+    // If userId is a string, return it directly
+    if (typeof userId === 'string') {
+      return userId;
+    }
+    
+    return 'Unknown ID';
   };
 
   const getStatusColor = (status: string) => {
@@ -115,7 +176,7 @@ const Order = () => {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedOrders(orders.map(order => order._id));
+      setSelectedOrders(filteredOrders.map(order => order._id));
     } else {
       setSelectedOrders([]);
     }
@@ -129,12 +190,41 @@ const Order = () => {
     );
   };
 
+  // Handle view order details
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
+  };
+
+  // Close order details modal
+  const handleCloseModal = () => {
+    setSelectedOrder(null);
+  };
+
+  // Filter orders
   const filteredOrders = orders.filter(order => {
     if (filters.status !== 'all' && order.status !== filters.status) return false;
     if (filters.paymentMethod !== 'all' && order.paymentMethod !== filters.paymentMethod) return false;
-    if (filters.search && !order.orderId.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      return (
+        order.orderId.toLowerCase().includes(searchLower) ||
+        getCustomerName(order).toLowerCase().includes(searchLower) ||
+        order._id.toLowerCase().includes(searchLower)
+      );
+    }
     return true;
   });
+
+  // Pagination calculations
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   if (loading) {
     return (
@@ -201,7 +291,7 @@ const Order = () => {
               <input
                 type="checkbox"
                 onChange={handleSelectAll}
-                checked={selectedOrders.length === orders.length && orders.length > 0}
+                checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
                 className="rounded"
               />
               <select className="border rounded px-3 py-2 text-sm">
@@ -273,11 +363,15 @@ const Order = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input type="checkbox" onChange={handleSelectAll} />
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                  <input 
+                    type="checkbox" 
+                    onChange={handleSelectAll}
+                    checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
+                  />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order
+                  Order ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -300,7 +394,7 @@ const Order = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
+              {currentOrders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -314,6 +408,9 @@ const Order = () => {
                     <div className="text-sm font-medium text-gray-900">
                       #{order.orderId}
                     </div>
+                    <div className="text-xs text-gray-500">
+                      ID: {order._id.substring(0, 8)}...
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
@@ -326,11 +423,11 @@ const Order = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      Customer ID: {order.userId.substring(0, 8)}...
+                    <div className="text-sm font-medium text-gray-900">
+                      {getCustomerName(order)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {order.shippingAddress.city}, {order.shippingAddress.state}
+                      {getCustomerEmail(order)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -352,7 +449,10 @@ const Order = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-3">
+                    <button 
+                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      onClick={() => handleViewOrder(order)}
+                    >
                       View
                     </button>
                     <button className="text-green-600 hover:text-green-900 mr-3">
@@ -378,21 +478,175 @@ const Order = () => {
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            Showing {filteredOrders.length} of {orders.length} orders
+            Showing {indexOfFirstOrder + 1} to {Math.min(indexOfLastOrder, filteredOrders.length)} of {filteredOrders.length} orders
           </div>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 border rounded text-sm disabled:opacity-50">
+            <button 
+              className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
               Previous
             </button>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
-              1
-            </button>
-            <button className="px-3 py-1 border rounded text-sm">
+            
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNumber;
+              if (totalPages <= 5) {
+                pageNumber = i + 1;
+              } else if (currentPage <= 3) {
+                pageNumber = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNumber = totalPages - 4 + i;
+              } else {
+                pageNumber = currentPage - 2 + i;
+              }
+              
+              return (
+                <button
+                  key={pageNumber}
+                  className={`px-3 py-1 rounded text-sm ${
+                    currentPage === pageNumber
+                      ? 'bg-blue-600 text-white'
+                      : 'border hover:bg-gray-50'
+                  }`}
+                  onClick={() => handlePageChange(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+            
+            <button 
+              className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
               Next
             </button>
           </div>
         </div>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              
+              {/* Order Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Order Information</h3>
+                  <div className="space-y-1">
+                    <p><span className="font-medium">Order ID:</span> {selectedOrder.orderId}</p>
+                    <p><span className="font-medium">Date:</span> {formatDate(selectedOrder.createdAt)}</p>
+                    <p><span className="font-medium">Status:</span> 
+                      <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(selectedOrder.status)}`}>
+                        {selectedOrder.status}
+                      </span>
+                    </p>
+                    <p><span className="font-medium">Payment Method:</span> {selectedOrder.paymentMethod}</p>
+                    {selectedOrder.paymentId && (
+                      <p><span className="font-medium">Payment ID:</span> {selectedOrder.paymentId}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Customer Information</h3>
+                  <div className="space-y-1">
+                    <p><span className="font-medium">Name:</span> {getCustomerName(selectedOrder)}</p>
+                    <p><span className="font-medium">Email:</span> {getCustomerEmail(selectedOrder)}</p>
+                    <p><span className="font-medium">Customer ID:</span> {getCustomerId(selectedOrder)}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Shipping Address */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p>{selectedOrder.shippingAddress.street}</p>
+                  <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zipCode}</p>
+                  <p>{selectedOrder.shippingAddress.country}</p>
+                </div>
+              </div>
+              
+              {/* Order Items */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Order Items</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Product</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Quantity</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Price</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {selectedOrder.items.map((item, index) => (
+                        <tr key={item._id || index}>
+                          <td className="px-4 py-2">
+                            <div className="text-sm font-medium text-gray-900">
+                              {typeof item.productId === 'string'
+                                ? item.productId
+                                : item.productId.name || item.productId._id}
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-2 text-sm">{item.quantity}</td>
+                          <td className="px-4 py-2 text-sm">${item.price.toFixed(2)}</td>
+                          <td className="px-4 py-2 text-sm">${(item.quantity * item.price).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Order Summary */}
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="flex justify-between mb-2">
+                  <span className="font-medium">Subtotal:</span>
+                  <span>${selectedOrder.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="font-medium">Shipping:</span>
+                  <span>${selectedOrder.shippingCost.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-gray-300">
+                  <span className="font-bold text-lg">Total:</span>
+                  <span className="font-bold text-lg">${selectedOrder.total.toFixed(2)}</span>
+                </div>
+              </div>
+              
+              {/* Actions */}
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                >
+                  Close
+                </button>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                  Update Status
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
