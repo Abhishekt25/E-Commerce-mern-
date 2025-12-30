@@ -6,7 +6,7 @@ import Loading from "../admin/components/Loading";
 // Lazy load pages
 const Layout = lazy(() => import("../frontend/HeaderandFooter/Layout"));
 const FrontendHome = lazy(() => import("../frontend/Home"));
-const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
+const FrontendProducts = lazy(() => import("../frontend/pages/ProductsPage/Products"));
 const FrontendProductDetails = lazy(() => import("../frontend/pages/ProductDetails"));
 import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
