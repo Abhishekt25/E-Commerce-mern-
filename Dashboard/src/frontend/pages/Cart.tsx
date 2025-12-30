@@ -143,10 +143,10 @@ const Cart = () => {
                   {/* Price */}
                   <div className="text-right">
                     <p className="font-semibold text-lg text-gray-900">
-                      ${(product.price * product.quantity).toFixed(2)}
+                      ₹{(product.price * product.quantity).toFixed(2)}
                     </p>
                     <p className="text-gray-600 text-sm">
-                      ${product.price} each
+                      ₹{product.price} each
                     </p>
                   </div>
                 </div>

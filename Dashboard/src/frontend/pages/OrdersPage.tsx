@@ -241,7 +241,7 @@ const OrdersPage = () => {
                             {item.product?.name || `Product ${index + 1}`}
                           </p>
                           <p className="text-sm text-gray-600">
-                            Qty: {item.quantity} × ${item.price.toFixed(2)}
+                            Qty: {item.quantity} × ₹{item.price.toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -262,8 +262,8 @@ const OrdersPage = () => {
                     <p className="font-medium text-gray-900 mt-2">Total</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-gray-600">${order.subtotal.toFixed(2)}</p>
-                    <p className="text-gray-600">${order.shippingCost.toFixed(2)}</p>
+                    <p className="text-gray-600">₹{order.subtotal.toFixed(2)}</p>
+                    <p className="text-gray-600">₹{order.shippingCost.toFixed(2)}</p>
                     <p className="font-bold text-lg text-gray-900 mt-2">
                       ₹{order.total.toFixed(2)}
                     </p>
