@@ -7,6 +7,7 @@ import Loading from "../admin/components/Loading";
 const Layout = lazy(() => import("../frontend/HeaderandFooter/Layout"));
 const FrontendHome = lazy(() => import("../frontend/Home"));
 const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
+const FrontendProductDetails = lazy(() => import("../frontend/pages/ProductDetails"));
 import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
 const Checkout = lazy(() => import("../frontend/pages/checkout/Checkout"));
@@ -41,6 +42,14 @@ const AppRouter = () => {
             element={
               <Layout>
                 <FrontendProducts />
+              </Layout>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <Layout>
+                <FrontendProductDetails />
               </Layout>
             }
           />

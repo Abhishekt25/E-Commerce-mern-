@@ -29,42 +29,58 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-xl">
+  <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-xl">
       <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
         Forgot Password
       </h2>
 
-      {message && <p className="text-green-600 text-center mb-4">{message}</p>}
-      {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+      {message && (
+        <p className="text-green-600 text-center mb-4">{message}</p>
+      )}
+      {error && (
+        <p className="text-red-600 text-center mb-4">{error}</p>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
+        {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
           <input
             type="email"
             {...register("email", { required: "Email is required" })}
-            className="w-full mt-2 px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full mt-2 px-4 py-3 border rounded-lg shadow-sm
+                      focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="Enter your email"
           />
           {errors.email && (
-            <span className="text-red-500 text-sm">{(errors.email as any)?.message}</span>
+            <span className="text-red-500 text-sm">
+              {(errors.email as any)?.message}
+            </span>
           )}
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition shadow-md"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg
+                    text-lg font-medium hover:bg-blue-700 transition shadow-md"
         >
           Send Reset Link
         </button>
 
-        <Link to="/login" className="text-blue-600 hover:underline text-sm block text-center">
+        <Link
+          to="/login"
+          className="text-blue-600 hover:underline text-sm block text-center"
+        >
           Remembered your password? Sign In
         </Link>
-
       </form>
     </div>
+  </div>
+
   );
 };
 

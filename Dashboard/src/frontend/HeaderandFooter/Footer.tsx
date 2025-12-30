@@ -9,7 +9,7 @@ const Footer = () => {
         
         {/* Company Info */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">ShopLogo</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">ShopAb</h2>
           <p className="text-sm text-gray-400 leading-relaxed">
             Your trusted store for quality products and excellent service.
             Discover top-rated items curated just for you.
@@ -112,7 +112,7 @@ const Footer = () => {
 
       {/* Bottom Footer */}
       <div className="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} ShopLogo. All rights reserved. 
+        © {new Date().getFullYear()} ShopAB. All rights reserved. 
       </div>
     </footer>
   );

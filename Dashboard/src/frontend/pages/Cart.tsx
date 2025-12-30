@@ -90,25 +90,30 @@ const Cart = () => {
                 <div className="flex gap-4">
                   {/* Product Image */}
                   <div className="flex-shrink-0">
-                    {product.image ? (
-                      <img
-                        src={`${API_BASE_URL}/uploads/${product.image}`}
-                        alt={product.product}
-                        className="w-20 h-20 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm">
-                        No Image
-                      </div>
-                    )}
+                    <Link to={`/product/${product._id}`}>
+                      {product.image ? (
+                        <img
+                          src={`${API_BASE_URL}/uploads/${product.image}`}
+                          alt={product.product}
+                          className="w-20 h-20 rounded-lg object-cover hover:opacity-80 transition"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm">
+                          No Image
+                        </div>
+                      )}
+                    </Link>
                   </div>
 
                   {/* Product Details */}
                   <div className="flex-grow">
-                    <h3 className="font-semibold text-lg text-gray-900">
-                      {product.product}
-                    </h3>
-                    
+                    <Link to={`/product/${product._id}`}>
+                      <h3 className="font-semibold text-lg text-gray-900 transition cursor-pointer">
+                        {product.product}
+                      </h3>
+                    </Link>
+
+            
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-3 mt-3">
                       <span className="text-gray-700 font-medium">Quantity:</span>
