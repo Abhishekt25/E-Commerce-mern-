@@ -42,17 +42,16 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const isFilterActive =
     filters.categories.length > 0 ||
-    filters.sort !== "" ||
-    filters.minPrice !== "" ||
-    filters.maxPrice !== "" ||
+    filters.sort ||
+    filters.minPrice ||
+    filters.maxPrice ||
     filters.inStockOnly;
 
   return (
-    <div className="w-64 bg-white p-4 rounded-xl shadow-md h-fit sticky top-6">
+    <div className="w-full lg:w-64 bg-white p-4 rounded-xl shadow-md h-fit lg:sticky lg:top-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Filters</h2>
 
-        {/* CLEAR ALL BUTTON */}
         <button
           onClick={clearAllFilters}
           disabled={!isFilterActive}
@@ -62,13 +61,11 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         </button>
       </div>
 
-      {/* CATEGORY FILTER */}
+      {/* CATEGORY */}
       <div className="mb-6">
         <h3 className="font-medium mb-2">Category</h3>
         {categories.length === 0 && (
-          <p className="text-sm text-gray-500">
-            No categories found
-          </p>
+          <p className="text-sm text-gray-500">No categories found</p>
         )}
         {categories.map((category) => (
           <label key={category} className="block text-sm mb-1">
