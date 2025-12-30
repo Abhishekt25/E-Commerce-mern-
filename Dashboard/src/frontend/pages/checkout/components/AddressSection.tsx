@@ -1,74 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import AddressForm, { type AddressData, type AddressErrors } from './AddressForm';
-import SameAddressCheckbox from './SameAddressCheckbox';
+import { useEffect } from "react";
+import AddressForm from "./AddressForm";
+import type { AddressData, AddressErrors } from "./AddressForm";
+import SameAddressCheckbox from "./SameAddressCheckbox";
 
-interface AddressSectionProps {
+interface Props {
   billingAddress: AddressData;
   shippingAddress: AddressData;
-  onBillingChange: (address: AddressData) => void;
-  onShippingChange: (address: AddressData) => void;
+  onBillingChange: (a: AddressData) => void;
+  onShippingChange: (a: AddressData) => void;
   billingErrors: AddressErrors;
   shippingErrors: AddressErrors;
+  sameAsBilling: boolean;
+  setSameAsBilling: (v: boolean) => void;
   userEmail?: string;
 }
 
-const AddressSection: React.FC<AddressSectionProps> = ({
+const AddressSection = ({
   billingAddress,
   shippingAddress,
   onBillingChange,
   onShippingChange,
   billingErrors,
   shippingErrors,
+  sameAsBilling,
+  setSameAsBilling,
   userEmail
-}) => {
-  const [sameAddress, setSameAddress] = useState(true);
-
-  // Initialize billing address with user email if available
+}: Props) => {
   useEffect(() => {
     if (userEmail && !billingAddress.email) {
-      onBillingChange({
-        ...billingAddress,
-        email: userEmail
-      });
+      onBillingChange({ ...billingAddress, email: userEmail });
     }
   }, [userEmail]);
 
-  // Handle same address checkbox
   useEffect(() => {
-    if (sameAddress) {
-      // Copy billing address to shipping address (excluding email and name fields)
-      const { email, firstName, lastName, ...shippingData } = billingAddress;
-      onShippingChange({
-        ...shippingData,
-        email: '',
-        firstName: '',
-        lastName: ''
-      });
+    if (sameAsBilling) {
+      const { email, firstName, lastName, ...rest } = billingAddress;
+      onShippingChange(rest);
     }
-  }, [sameAddress, billingAddress]);
+  }, [sameAsBilling, billingAddress]);
 
-  const handleSameAddressChange = (checked: boolean) => {
-    setSameAddress(checked);
-  };
-
-  const handleBillingChange = (address: AddressData) => {
-    onBillingChange(address);
-    
-    // If same address is checked, update shipping too
-    if (sameAddress) {
-      const { email, firstName, lastName, ...shippingData } = address;
-      onShippingChange({
-        ...shippingData,
-        email: '',
-        firstName: '',
-        lastName: ''
-      });
+  const handleBillingChange = (data: AddressData) => {
+    onBillingChange(data);
+    if (sameAsBilling) {
+      const { email, firstName, lastName, ...rest } = data;
+      onShippingChange(rest);
     }
   };
 
   return (
-    <div className="mb-8">
-      {/* Billing Address */}
+    <>
       <AddressForm
         type="billing"
         address={billingAddress}
@@ -76,14 +56,12 @@ const AddressSection: React.FC<AddressSectionProps> = ({
         errors={billingErrors}
       />
 
-      {/* Same Address Checkbox */}
       <SameAddressCheckbox
-        checked={sameAddress}
-        onChange={handleSameAddressChange}
+        checked={sameAsBilling}
+        onChange={setSameAsBilling}
       />
 
-      {/* Shipping Address - Conditionally render if not same as billing */}
-      {!sameAddress && (
+      {!sameAsBilling && (
         <AddressForm
           type="shipping"
           address={shippingAddress}
@@ -91,10 +69,9 @@ const AddressSection: React.FC<AddressSectionProps> = ({
           errors={shippingErrors}
         />
       )}
-    </div>
+    </>
   );
 };
 
 export default AddressSection;
-// Export AddressData type for use in Checkout.tsx
 export type { AddressData };
