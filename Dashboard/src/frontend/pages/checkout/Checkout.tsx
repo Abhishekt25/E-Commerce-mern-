@@ -354,7 +354,6 @@ const Checkout = () => {
 
     // Validate addresses
     if (!validateAddresses()) {
-      alert("Please fix the errors in the address form.");
       return;
     }
 
