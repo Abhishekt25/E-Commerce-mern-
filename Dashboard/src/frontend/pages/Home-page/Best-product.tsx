@@ -110,15 +110,19 @@ const BestProduct = () => {
             {Array.from({ length: Math.ceil(products.length / 3) }).map((_, slideIndex) => (
               <div key={slideIndex} className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-3 gap-6 px-2">
                 {products.slice(slideIndex * 3, slideIndex * 3 + 3).map((product) => (
-                  <div key={product._id} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300">
+                  <div
+                    key={product._id}
+                    onClick={() => navigate(`/product/${product._id}`)}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer">
+
                     {/* Product Image with Sale Badge */}
                     <div className="relative">
                       {product.image ? (
-                        <img
-                          src={`${API_BASE_URL}/uploads/${product.image}`}
-                          alt={product.product}
-                          className="w-full h-64 object-cover"
-                        />
+                          <img
+                            src={`${API_BASE_URL}/uploads/${product.image}`}
+                            alt={product.product}
+                            className="w-full h-64 object-cover"
+                          />
                       ) : (
                         <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-500">No Image</span>
@@ -134,14 +138,13 @@ const BestProduct = () => {
                       <div className="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                         Best Sales
                       </div>
-                    </div>
+                      </div>
 
                     {/* Product Info */}
                     <div className="p-6">
                       <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
                         {product.product}
                       </h3>
-
                       {/* Price */}
                       <div className="flex items-center gap-2 mb-4">
                         {product.salePrice ? (
@@ -156,9 +159,12 @@ const BestProduct = () => {
 
                       {/* Add to Cart Button */}
                       <button
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();   // stop card click
+                          handleAddToCart(product);
+                        }}
                         disabled={product.stock <= 0}
-                        className={`w-full py-3 rounded-lg font-semibold transition-colors duration-300 ${
+                        className={`w-full py-3 rounded-lg font-semibold transition-colors duration-300 cursor-pointer ${
                           product.stock > 0
                             ? "bg-blue-600 hover:bg-blue-700 text-white"
                             : "bg-gray-400 cursor-not-allowed text-gray-700"
@@ -167,14 +173,19 @@ const BestProduct = () => {
                         {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
                       </button>
 
+
                       {/* View Cart Button */}
                       {showViewCart === product._id && (
                         <button
-                          onClick={handleViewCart}
-                          className="mt-2 w-full py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all duration-300"
-                        >
-                          View Cart
+                            onClick={(e) => {
+                              e.stopPropagation();   // stop card click
+                              handleViewCart();
+                            }}
+                            className="mt-2 w-full py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all cursor-pointer duration-300"
+                          >
+                            View Cart
                         </button>
+
                       )}
                     </div>
                   </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 interface Product {
   _id: string;
@@ -83,7 +83,7 @@ const Products = () => {
       {addedProduct && (
         <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex justify-between items-center">
           <span>
-            🛒 <strong>{addedProduct.name}</strong> (₹{addedProduct.price}) added to cart
+            🛒 <strong>{addedProduct.name}</strong> (₹{addedProduct.price})
           </span>
           <button
             onClick={handleViewCart}
@@ -101,21 +101,33 @@ const Products = () => {
         {filteredProducts.map((product) => (
           <div
             key={product._id}
-            className="border rounded-2xl shadow-md p-4 flex flex-col items-center text-center bg-white"
+            onClick={() => navigate(`/product/${product._id}`)}
+            className="border rounded-2xl shadow-md p-4 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-lg transition"
           >
             {product.image ? (
-              <img
-                src={`${API_BASE_URL}/uploads/${product.image}`}
-                alt={product.product}
-                className="w-48 h-48 object-cover mb-4 rounded-lg"
-              />
+        <Link to={`/product/${product._id}`} className="w-full">
+          <div className="w-full h-40 flex items-center justify-center mb-4">
+            <img
+              src={`${API_BASE_URL}/uploads/${product.image}`}
+              alt={product.product}
+              className="max-h-full max-w-full object-contain rounded-lg"
+            />
+          </div>
+        </Link>
+
+
             ) : (
               <div className="w-48 h-48 bg-gray-200 mb-4 flex items-center justify-center rounded-lg">
                 No Image
               </div>
             )}
 
-            <h2 className="text-lg font-medium">{product.product}</h2>
+            <Link to={`/product/${product._id}`}>
+              <h2 className="text-lg font-medium hover:text-blue-600 cursor-pointer">
+                {product.product}
+              </h2>
+            </Link>
+
             <p className="text-gray-600 mt-1">₹{product.price}</p>
 
             <p
@@ -127,7 +139,10 @@ const Products = () => {
             </p>
 
             <button
-              onClick={() => handleAddToCart(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart(product);
+              }}
               disabled={product.stock <= 0}
               className={`mt-4 w-full py-2 rounded-xl text-white ${
                 product.stock > 0
@@ -137,14 +152,17 @@ const Products = () => {
             >
               Add to Cart
             </button>
-
             {showViewCart === product._id && (
               <button
-                onClick={handleViewCart}
-                className="mt-2 w-full py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white transition-all duration-300"
-              >
-                View Cart
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewCart();
+                  }}
+                  className="mt-2 w-full py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white transition-all duration-300"
+                >
+                  View Cart
               </button>
+
             )}
           </div>
         ))}
