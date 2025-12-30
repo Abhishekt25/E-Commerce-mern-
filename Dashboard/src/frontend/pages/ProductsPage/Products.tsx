@@ -7,7 +7,7 @@ interface Product {
   product: string;
   price: number;
   stock: number;
-  categories: string[]; 
+  categories: string[];
   sku?: string;
   image?: string;
 }
@@ -37,10 +37,13 @@ const Products = () => {
     inStockOnly: false,
   });
 
+  // 🔹 Mobile filter toggle
+  const [showFilters, setShowFilters] = useState(false);
+
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
 
-  /* FETCH PRODUCTS*/
+  /*  FETCH PRODUCTS  */
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -57,16 +60,14 @@ const Products = () => {
     setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
   }, [API_BASE_URL]);
 
-  /*FILTER PRODUCTS */
+  /* FILTER PRODUCTS */
   const filteredProducts = products
     .filter((p) => {
-      // CATEGORY FILTER (array vs array)
       if (
         filters.categories.length &&
         !p.categories.some((cat) => filters.categories.includes(cat))
-      ) {
+      )
         return false;
-      }
 
       if (filters.inStockOnly && p.stock <= 0) return false;
       if (filters.minPrice && p.price < Number(filters.minPrice)) return false;
@@ -82,7 +83,7 @@ const Products = () => {
       return 0;
     });
 
-  /* ADD TO CART*/
+  /*ADD TO CART  */
   const handleAddToCart = (product: Product) => {
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
     const item = existingCart.find((i: any) => i._id === product._id);
@@ -105,9 +106,10 @@ const Products = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6 min-h-screen">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 min-h-screen">
+      {/* SUCCESS MESSAGE */}
       {addedProduct && (
-        <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-6 flex justify-between">
+        <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex justify-between">
           <span>
             🛒 {addedProduct.name} (₹{addedProduct.price})
           </span>
@@ -120,13 +122,23 @@ const Products = () => {
         </div>
       )}
 
-      <div className="flex gap-6">
-        {/* SIDEBAR FILTER */}
-        <ProductFilters
-          categories={allCategories}
-          filters={filters}
-          setFilters={setFilters}
-        />
+      {/* MOBILE FILTER BUTTON */}
+      <button
+        onClick={() => setShowFilters((prev) => !prev)}
+        className="lg:hidden mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
+      >
+        {showFilters ? "Hide Filters" : "Show Filters"}
+      </button>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* FILTER SIDEBAR */}
+        {(showFilters || window.innerWidth >= 1024) && (
+          <ProductFilters
+            categories={allCategories}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        )}
 
         {/* PRODUCTS GRID */}
         <div className="flex-1">
@@ -134,7 +146,7 @@ const Products = () => {
             Products
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
               <div
                 key={product._id}
