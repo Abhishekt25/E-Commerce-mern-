@@ -9,7 +9,7 @@ const FrontendHome = lazy(() => import("../frontend/Home"));
 const FrontendProducts = lazy(() => import("../frontend/pages/Products"));
 import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
-const Checkout = lazy(() => import("../frontend/pages/Checkout"));
+const Checkout = lazy(() => import("../frontend/pages/checkout/Checkout"));
 const OrderSuccess = lazy(() => import("../frontend/pages/OrderSuccess"));
 const OrdersPage = lazy(() => import("../frontend/pages/OrdersPage"));
 const AdminRouter = lazy(() => import("./AdminRouter"));
