@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import SearchDropdown from "./SearchDropdown";
 import {
   ShoppingCartIcon,
   UserIcon,
@@ -16,6 +17,9 @@ const Header: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
 
   const backendURL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:2507";
@@ -77,15 +81,35 @@ const Header: React.FC = () => {
   }, [location.search]);
 
   // 🔹 Debounced search
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
+  let lastSearchValue = "";
+const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setSearchQuery(value);
+  lastSearchValue = value;
 
+  if (!value.trim()) {
     clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      navigate(`/products?search=${encodeURIComponent(value)}`);
-    }, 500);
-  };
+    setResults([]);
+    setShowDropdown(false);
+    return;
+  }
+
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(async () => {
+    const res = await fetch(
+      `${backendURL}/api/products?search=${encodeURIComponent(value)}`
+    );
+
+    const data = await res.json();
+
+    // Ignore old responses
+    if (lastSearchValue !== value) return;
+
+    setResults(data);
+    setShowDropdown(data.length > 0);
+  }, 400);
+};
+
 
   // 🔹 Logout
   const handleLogout = () => {
@@ -96,6 +120,13 @@ const Header: React.FC = () => {
     setUserName("");
     navigate("/");
   };
+
+    const clearSearch = () => {
+    setSearchQuery("");
+    setResults([]);
+    setShowDropdown(false);
+  };
+
 
   return (
     <header className="bg-gray-900 text-gray-300 sticky top-0 z-50 shadow-md">
@@ -122,15 +153,24 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-5">
 
             {/* Search */}
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Search products..."
-              className="hidden sm:block bg-gray-800 border border-gray-700 text-gray-200
-                         rounded-md px-4 py-2 text-sm placeholder-gray-400
-                         focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+            <div className="relative hidden sm:block w-80">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearch}
+                placeholder="Search products..."
+                className="w-full bg-gray-800 border border-gray-700 text-gray-200
+                          rounded-md px-4 py-2 text-sm placeholder-gray-400
+                          focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+
+              <SearchDropdown
+                products={results}
+                visible={showDropdown}
+                onSelect={clearSearch}
+              />
+            </div>
+
 
             {/* Login / User */}
             {isLoggedIn ? (

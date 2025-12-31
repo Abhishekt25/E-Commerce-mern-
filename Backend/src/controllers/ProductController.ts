@@ -13,6 +13,10 @@ const storage = multer.diskStorage({
 
 export const upload = multer({ storage });
 
+const escapeRegex = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+
 export const addProduct = async (req: Request, res: Response) => {
   try {
     const { product,slug,sku,stock,price,status,categories,description,shortDescription,tags,variants,marketplaces, } = req.body;
@@ -56,13 +60,47 @@ export const addProduct = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const search = (req.query.search as string)?.trim();
+    let query: any = {};
+
+    if (search && search.length > 0) {
+      const safeSearch = escapeRegex(search);
+
+      const orConditions: any[] = [
+        { product: { $regex: safeSearch, $options: "i" } },
+        { sku: { $regex: safeSearch, $options: "i" } },
+        { description: { $regex: safeSearch, $options: "i" } },
+        { shortDescription: { $regex: safeSearch, $options: "i" } },
+        { categories: { $regex: safeSearch, $options: "i" } },
+        { tags: { $regex: safeSearch, $options: "i" } },
+      ];
+
+      //  PRICE partial match (5, 59, 59.9, 59.99)
+      if (!isNaN(Number(search))) {
+        orConditions.push({
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$price" },
+              regex: `.*${safeSearch}.*`,
+            },
+          },
+        });
+      }
+
+      query = { $or: orConditions };
+    }
+
+    const products = await Product.find(query)
+      .sort({ createdAt: -1 })
+      .limit(20);
+
     res.status(200).json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products', error });
+    console.error("Search error:", error);
+    res.status(500).json({ message: "Error fetching products", error });
   }
 };
+
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
