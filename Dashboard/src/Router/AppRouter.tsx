@@ -2,13 +2,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "../admin/components/Loading";
+import ContactUs from "../frontend/pages/ContactUs";
 
 // Lazy load pages
 const Layout = lazy(() => import("../frontend/HeaderandFooter/Layout"));
 const FrontendHome = lazy(() => import("../frontend/Home"));
 const FrontendProducts = lazy(() => import("../frontend/pages/ProductsPage/Products"));
 const FrontendProductDetails = lazy(() => import("../frontend/pages/ProductDetails"));
-import ContactUs from "../frontend/pages/ContactUs";
 const Cart = lazy(() => import("../frontend/pages/Cart"));
 const Checkout = lazy(() => import("../frontend/pages/checkout/Checkout"));
 const OrderSuccess = lazy(() => import("../frontend/pages/OrderSuccess"));
